@@ -3,19 +3,21 @@
 class LoadPicture {
     constructor(params) {
         this.url = params.url;
-        this.area = document.querySelector('.display'); // Select the container with the class "display"
+        this.area = document.querySelector('.display');
         this.batchSize = params.numberPhoto || 10;
         this.order = params.order;
         this.currentIndex = 0;
         this.pictures = null;
-        console.log('constructor');
+        this.allPictures = null;
+        this.displayedPictures = null;
 
-        this.displayPictures(); // Call displayPictures to initiate the process
+        this.nextButtonCreated = false;
+        this.prevButtonCreated = false;
+
+        this.displayPictures();
     }
 
     createArea() {
-        console.log('create area BEG');
-
         const area = document.createElement('div');
         area.classList.add("photo");
 
@@ -28,66 +30,52 @@ class LoadPicture {
         console.log(img.src);
 
         this.area.appendChild(area);
-        console.log(area);
 
-        if (this.currentIndex >= this.pictures.length - 1) { // Compare currentIndex with the number of pictures
+        if (this.currentIndex >= this.batchSize && !this.nextButtonCreated) {
             this.createBtn('next', area);
-        } else if (this.currentIndex > 0) { // If currentIndex is greater than 0, create 'previous' button
+            this.nextButtonCreated = true;
+        } else if (this.currentIndex >= this.batchSize && !this.prevButtonCreated) {
             this.createBtn('previous', area);
+            this.prevButtonCreated = true; 
         }
-        console.log('create area END');
     }
 
-
-    async load() { // request OK pas touche
-        console.log('load BEG');
-
-        const startIndex = this.currentIndex;
-        const endIndex = this.currentIndex + this.batchSize;
-
+    async load() {
         try {
-
-            const responsePictures = await fetch(`${this.url}?_start=${startIndex}&_end=${endIndex}&_limit=${this.batchSize}`);
-            const pictures = await responsePictures.json();
-
-            const url = pictures.map(picture => picture.url);
-
-            // console.log(url[this.currentIndex]);
-            console.log('load END');
-            return url;
-
+            const responsePictures = await fetch(this.url);
+            this.allPictures = await responsePictures.json(); // Populate allPictures
+            return this.allPictures.map(picture => picture.url);
         } catch (e) {
-            console.error(`An error occured ${e.message}`);
+            console.error(`An error occurred: ${e.message}`);
         }
     }
 
     async displayPictures() {
-        console.log('display pictures BEG');
-
         this.pictures = await this.load();
-
-        for (const photo of this.pictures) {
+    
+        for (let i = 0; i < this.pictures.length; i++) {
             this.createArea();
+            this.currentIndex++;
         }
-        console.log('display pictures END');
     }
+    
 
     createBtn(position, area) {
-        console.log('create button BEG');
-
         const button = document.createElement('button');
         button.classList.add(position);
         button.innerHTML = `<i class="icon-${position}"></i>`;
 
         if (position === 'next') {
-            button.addEventListener('click', () => this.nextImage());
+            button.addEventListener('click', () => {
+                this.currentIndex += this.batchSize;
+            });
         } else if (position === 'previous') {
-            button.addEventListener('click', () => this.prevImage());
+            button.addEventListener('click', () => {
+                this.currentIndex -= this.batchSize;
+            });
         }
 
         area.appendChild(button);
-
-        console.log('create button END');
     }
 
 }
