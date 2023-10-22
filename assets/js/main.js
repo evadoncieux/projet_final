@@ -3,19 +3,19 @@
 class LoadPicture {
     constructor(params) {
         this.url = params.url;
-        this.area = document.querySelector(params.area);
+        this.area = document.querySelector('.display'); // Select the container with the class "display"
         this.batchSize = params.numberPhoto || 10;
         this.order = params.order;
         this.currentIndex = 0;
         this.pictures = null;
         console.log('constructor');
 
-        // this.createArea();
-        this.displayPictures();
+        this.displayPictures(); // Call displayPictures to initiate the process
     }
 
     createArea() {
         console.log('create area BEG');
+
         const area = document.createElement('div');
         area.classList.add("photo");
 
@@ -28,11 +28,11 @@ class LoadPicture {
         console.log(img.src);
 
         this.area.appendChild(area);
+        console.log(area);
 
-        if (this.currentIndex >= 10) {
+        if (this.currentIndex >= this.pictures.length - 1) { // Compare currentIndex with the number of pictures
             this.createBtn('next', area);
-
-        } else if (this.currentIndex >= 20) {
+        } else if (this.currentIndex > 0) { // If currentIndex is greater than 0, create 'previous' button
             this.createBtn('previous', area);
         }
         console.log('create area END');
