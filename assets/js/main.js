@@ -101,7 +101,7 @@ class LoadPicture {
     showLoader() {
         const loaderArea = document.querySelector('.loader');
         const loaderImg = document.createElement('img');
-        loader.src = 'assets/images/loader.png'
+        loader.src = './images/loader.png'
         loader.style.width = '50px';
 
         if (!this.photosDisplayed) {
