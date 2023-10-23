@@ -6,7 +6,6 @@
 @param area
 @param batchSize
 @param order
-@param currentIndex
 
 */
 class LoadPicture {
@@ -20,6 +19,7 @@ class LoadPicture {
         this.currentBatchIndex = 0;
         this.pictures = null;
         this.allPictures = null;
+        this.photosDisplayed = false;
 
         this.displayPictures();
     }
@@ -57,6 +57,8 @@ class LoadPicture {
                 this.createNextButton(cell);
             }
         }
+        this.photosDisplayed = true;
+
     }
 
     /**
@@ -94,14 +96,34 @@ class LoadPicture {
     }
 
     /**
+     * this method toggles the loading icon while the images are loading
+     */
+    showLoader() {
+        const loaderArea = document.querySelector('.loader');
+        const loaderImg = document.createElement('img');
+        loader.src = 'assets/images/loader.png'
+        loader.style.width = '50px';
+
+        if (!this.photosDisplayed) {
+            loader.innerHTML = '';
+            loader.appendChild(loaderImg);
+            loader.style.display = 'block';
+        } else {
+            loader.innerHTML = '';
+            loader.style.display = 'none';
+        }
+    }
+
+    /**
  * this method gets the pictures from the API
  */
     async load() {
         try {
-            const responsePictures = await fetch(`${this.url}?_limit=5000`);
+            this.photosDisplayed = false;
+            const responsePictures = await fetch(`${this.url}`);
             this.allPictures = await responsePictures.json();
 
-            if (this.order = 'DESC') {
+            if (this.order === 'DESC') {
                 this.allPictures.sort((a, b) => b.id - a.id);
             }
 
